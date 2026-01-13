@@ -1,14 +1,9 @@
-output "instance_id" {
-  description = "The ID of the EC2 instance"
-  value       = aws_instance.my_instance.id
+output "web_security_group_id" {
+  description = "ID of the web tier security group"
+  value       = aws_security_group.web.id
 }
 
-output "instance_public_ip" {
-  description = "The public IP address of the EC2 instance"
-  value       = aws_instance.my_instance.public_ip
-}
-
-output "instance_private_ip" {
-  description = "The private IP address of the EC2 instance"
-  value       = aws_instance.my_instance.private_ip
+output "app_security_group_id" {
+  description = "ID of the app tier security group"
+  value       = aws_security_group.app.id
 }

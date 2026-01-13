@@ -1,35 +1,59 @@
 variable "aws_region" {
-  description = "The AWS region where resources will be created"
+  description = "AWS region for resources"
   type        = string
   default     = "us-east-1"
 }
 
+variable "environment" {
+  description = "Environment name"
+  type        = string
+  default     = "dev"
+}
+
 variable "vpc_cidr" {
-  description = "The CIDR block for the VPC"
+  description = "CIDR block for VPC"
   type        = string
-  default     = "10.0.0.0/16"
 }
 
-variable "public_subnet_cidr" {
-  description = "The CIDR block for the public subnet"
+variable "vpc_name" {
+  description = "Name tag for VPC"
   type        = string
-  default     = "10.0.1.0/24"
 }
 
-variable "private_subnet_cidr" {
-  description = "The CIDR block for the private subnet"
-  type        = string
-  default     = "10.0.2.0/24"
+variable "public_subnet_count" {
+  description = "Number of public subnets"
+  type        = number
+  default     = 2
 }
 
-variable "instance_type" {
-  description = "The type of EC2 instance to launch"
-  type        = string
-  default     = "t2.micro"
+variable "private_subnet_count" {
+  description = "Number of private subnets"
+  type        = number
+  default     = 2
 }
 
-variable "key_name" {
-  description = "The name of the key pair to use for SSH access"
+variable "public_subnet_cidrs" {
+  description = "CIDR blocks for public subnets"
+  type        = list(string)
+}
+
+variable "private_subnet_cidrs" {
+  description = "CIDR blocks for private subnets"
+  type        = list(string)
+}
+
+variable "availability_zones" {
+  description = "Availability zones"
+  type        = list(string)
+}
+
+variable "project_name" {
+  description = "Project name for resource naming"
   type        = string
-  default     = ""
+}
+
+variable "tags" {
+  description = "Common tags for all resources"
+  type        = map(string)
+  default     = {}
 }

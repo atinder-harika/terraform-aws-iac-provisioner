@@ -1,14 +1,14 @@
-output "s3_bucket_name" {
-  description = "The name of the S3 bucket created for storage."
-  value       = aws_s3_bucket.my_bucket.bucket
+output "bucket_id" {
+  description = "ID of the S3 bucket"
+  value       = aws_s3_bucket.data.id
 }
 
-output "rds_endpoint" {
-  description = "The endpoint of the RDS instance."
-  value       = aws_db_instance.my_db.endpoint
+output "bucket_arn" {
+  description = "ARN of the S3 bucket"
+  value       = aws_s3_bucket.data.arn
 }
 
-output "rds_instance_id" {
-  description = "The ID of the RDS instance."
-  value       = aws_db_instance.my_db.id
+output "bucket_domain_name" {
+  description = "Domain name of the S3 bucket"
+  value       = aws_s3_bucket.data.bucket_domain_name
 }

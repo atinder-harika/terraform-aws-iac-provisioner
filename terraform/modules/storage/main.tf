@@ -1,33 +1,35 @@
-resource "aws_s3_bucket" "my_bucket" {
-  bucket = var.bucket_name
-  acl    = "private"
+resource "aws_s3_bucket" "data" {
+  bucket = "${var.bucket_prefix}-${var.environment}-data"
 
   tags = {
-    Name        = var.bucket_name
+    Name        = "${var.bucket_prefix}-${var.environment}-data"
     Environment = var.environment
   }
 }
 
-resource "aws_s3_bucket_versioning" "my_bucket_versioning" {
-  bucket = aws_s3_bucket.my_bucket.id
+resource "aws_s3_bucket_versioning" "data" {
+  bucket = aws_s3_bucket.data.id
 
-  versioning {
-    enabled = true
+  versioning_configuration {
+    status = var.enable_versioning ? "Enabled" : "Disabled"
   }
 }
 
-resource "aws_s3_bucket_policy" "my_bucket_policy" {
-  bucket = aws_s3_bucket.my_bucket.id
+resource "aws_s3_bucket_server_side_encryption_configuration" "data" {
+  bucket = aws_s3_bucket.data.id
 
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Principal = "*"
-        Action = "s3:GetObject"
-        Resource = "${aws_s3_bucket.my_bucket.arn}/*"
-      }
-    ]
-  })
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "data" {
+  bucket = aws_s3_bucket.data.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
 }

@@ -1,48 +1,42 @@
-resource "aws_vpc" "main" {
-  cidr_block = var.vpc_cidr
-  enable_dns_support = true
-  enable_dns_hostnames = true
-  tags = {
-    Name = "${var.environment}-vpc"
+terraform {
+  required_version = ">= 1.5.0"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
   }
 }
 
-resource "aws_subnet" "public" {
-  count = var.public_subnet_count
-  vpc_id = aws_vpc.main.id
-  cidr_block = element(var.public_subnet_cidrs, count.index)
-  availability_zone = element(var.availability_zones, count.index)
-  map_public_ip_on_launch = true
-  tags = {
-    Name = "${var.environment}-public-subnet-${count.index + 1}"
-  }
+provider "aws" {
+  region = var.aws_region
 }
 
-resource "aws_subnet" "private" {
-  count = var.private_subnet_count
-  vpc_id = aws_vpc.main.id
-  cidr_block = element(var.private_subnet_cidrs, count.index)
-  availability_zone = element(var.availability_zones, count.index)
-  tags = {
-    Name = "${var.environment}-private-subnet-${count.index + 1}"
-  }
+module "networking" {
+  source = "../../modules/networking"
+
+  vpc_cidr             = var.vpc_cidr
+  vpc_name             = var.vpc_name
+  public_subnet_count  = var.public_subnet_count
+  private_subnet_count = var.private_subnet_count
+  public_subnet_cidrs  = var.public_subnet_cidrs
+  private_subnet_cidrs = var.private_subnet_cidrs
+  availability_zones   = var.availability_zones
 }
 
-resource "aws_security_group" "allow_http" {
-  vpc_id = aws_vpc.main.id
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  tags = {
-    Name = "${var.environment}-allow-http"
-  }
+module "compute" {
+  source = "../../modules/compute"
+
+  vpc_id              = module.networking.vpc_id
+  environment         = var.environment
+  allowed_cidr_blocks = ["0.0.0.0/0"]
+}
+
+module "storage" {
+  source = "../../modules/storage"
+
+  bucket_prefix     = var.project_name
+  environment       = var.environment
+  enable_versioning = true
 }
